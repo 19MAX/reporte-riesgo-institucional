@@ -34,7 +34,7 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
     <li class="nav-item <?= ($modulo === 'USERS') ? 'active' : '' ?>">
-        <a class="nav-link" href="index.php?modulo=users">
+        <a class="nav-link" href="<?=base_url("admin/users")?>">
             <i class="fas fa-user"></i>
             <span>Usuarios</span></a>
     </li>
