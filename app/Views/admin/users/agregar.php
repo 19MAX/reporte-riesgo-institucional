@@ -1,3 +1,10 @@
+<?= $this->extend('layouts/main_layout') ?>
+
+<?= $this->section('title') ?>
+Usuarios
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 <!-- Page Heading -->
 <h1 class="h3 mb-4 text-gray-800">Usuario</h1>
 
@@ -49,7 +56,8 @@
                     </div>
                     <div class="mb-3" id="instituteContainer" style="display: none;">
                         <label for="inputInstitute" class="form-label">Instituto</label>
-                        <select class="form-select" id="inputInstitute" name="id_instituto" style="width: 100%;"></select>
+                        <select class="form-select" id="inputInstitute" name="id_instituto"
+                            style="width: 100%;"></select>
                     </div>
                     <div class="mb-3" id="campusContainer" style="display: none;">
                         <label for="inputCampus" class="form-label">Campus</label>
@@ -59,10 +67,16 @@
 
             </div>
             <div class="card-footer">
-                <button type="submit" form="agregarUsuarioForm" id="btnSaveUsuario" class="btn btn-primary">Agregar Usuario</button>
+                <button type="submit" form="agregarUsuarioForm" id="btnSaveUsuario" class="btn btn-primary">Agregar
+                    Usuario</button>
             </div>
         </div>
     </div>
 
+</div>
 
-    <script src="../users/agregar.js"></script>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script src="<?=base_url("assets/js/admin/users/agregar.js")?>"></script>
+<?= $this->endSection() ?>
