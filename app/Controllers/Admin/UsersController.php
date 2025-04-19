@@ -199,6 +199,78 @@ class UsersController extends BaseController
         }
     }
 
+    public function updatePassword()
+    {
+        try {
+            // Obtener datos POST
+            $id = $this->request->getPost('id');
+            $newPassword = $this->request->getPost('newPassword');
+
+            // Validación
+            $validation = \Config\Services::validation();
+            $validation->setRules([
+                'id' => [
+                    'label' => 'Id',
+                    'rules' => 'required|numeric',
+                ],
+                'newPassword' => [
+                    'label' => 'Nueva contraseña',
+                    'rules' => 'required|min_length[6]',
+                ]
+            ]);
+
+            $data = [
+                'id' => $id,
+                'newPassword' => $newPassword
+            ];
+
+            if (!$validation->run($data)) {
+                return $this->response
+                    ->setStatusCode(422)
+                    ->setJSON([
+                        'success' => false,
+                        'errors' => $validation->getErrors(),
+                    ]);
+            }
+
+            // Verificar que el usuario exista
+            $userExists = $this->usersModel->find($id);
+            if (!$userExists) {
+                return $this->response
+                    ->setStatusCode(404)
+                    ->setJSON([
+                        'error' => 'El usuario no existe.',
+                    ]);
+            }
+
+            // Hashear la nueva contraseña
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+            // Actualizar solo la contraseña
+            if ($this->usersModel->update($id, ['password' => $hashedPassword])) {
+                return $this->response
+                    ->setStatusCode(200)
+                    ->setJSON([
+                        'success' => true,
+                        'message' => 'Contraseña actualizada correctamente.',
+                    ]);
+            } else {
+                return $this->response
+                    ->setStatusCode(500)
+                    ->setJSON([
+                        'success' => false,
+                        'error' => 'Error al actualizar la contraseña.',
+                    ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'error' => 'Error interno: ' . $e->getMessage(),
+                ]);
+        }
+    }
+
     public function deleteUsers()
     {
         try {

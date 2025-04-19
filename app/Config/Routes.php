@@ -83,6 +83,7 @@ $routes->group('admin', static function ($routes) {
         $users->get('add', 'Admin\UsersController::add');
         $users->post('registro', 'Admin\UsersController::registrar');
         $users->post('updateUser', 'Admin\UsersController::updateUser');
+        $users->post('updatePassword', 'Admin\UsersController::updatePassword');
         $users->post('deleteUser', 'Admin\UsersController::deleteUsers');
         $users->post('update', 'Admin\UsersController::update');
         $users->post('delete', 'Admin\UsersController::delete');
