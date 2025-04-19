@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main_layout') ?>
 
 <?= $this->section('title') ?>
-Usuarios
+Agregar Usuarios
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
