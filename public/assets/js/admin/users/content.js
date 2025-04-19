@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 titleAttr: "Agregar usuario",
                 className: "bg-success rounded mb-1",
                 action: function () {
-                    window.location.href = "../main/index.php?modulo=agregar_usuario";
+                    window.location.href = base_url + "admin/users/add";
                 },
             },
         ],
