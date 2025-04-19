@@ -379,6 +379,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         // Limpiar campos
                         document.getElementById("newPassword").value = "";
                         document.getElementById("confirmPassword").value = "";
+                        reloadSection();
                     }
                 })
                 .catch((error) => {
