@@ -18,7 +18,6 @@ $routes->get('getNewCsrfToken', 'CsrfController::getNewCsrfToken');
 $routes->get('getUserData', 'UserController::getUserData');
 $routes->get('getAllUsers', 'UserController::getAllUsers');
 $routes->post('login', 'UserController::login');
-$routes->post('registro', 'UserController::registrar');
 $routes->post('resetpassci', 'UserController::resetPassClient');
 $routes->post('cambiarPass', 'UserController::cambiarPass');
 $routes->post('assignCampus', 'UserController::asignarUsuarioACampus');
@@ -41,7 +40,6 @@ $routes->post('updateSede', 'SedeController::updateSede');
 $routes->post('deleteSede', 'SedeController::deleteSede');
 
 // Rutas para el CampusController
-$routes->get('getAllCampus', 'CampusController::getAllCampus');
 $routes->get('getCampus', 'CampusController::getCampus');
 $routes->post('insertCampus', 'CampusController::insertCampus');
 $routes->post('updateCampus', 'CampusController::updateCampus');
@@ -83,6 +81,7 @@ $routes->group('admin', static function ($routes) {
         $users->get('/', 'Admin\UsersController::index');
         $users->get('getAllUsersWithoutPassword', 'Admin\UsersController::getAllUsersWithoutPassword');
         $users->get('add', 'Admin\UsersController::add');
+        $users->post('registro', 'Admin\UsersController::registrar');
         $users->post('updateUser', 'Admin\UsersController::updateUser');
         $users->post('deleteUser', 'Admin\UsersController::deleteUsers');
         $users->post('update', 'Admin\UsersController::update');
@@ -91,14 +90,16 @@ $routes->group('admin', static function ($routes) {
 
     });
 
-    $routes->group('inscritos', static function ($inscritos) {
-        $inscritos->get('/', 'Admin\RegistrationsController::allInscritos');
-        $inscritos->post('update', 'Admin\InscripcionesController::update');
-        $inscritos->post('delete', 'Admin\InscripcionesController::delete');
-        $inscritos->get('trash', 'Admin\RegistrationsController::trash');
-        $inscritos->post('restore', 'Admin\RegistrationsController::restore');
-        $inscritos->post('deleteAll', 'Admin\RegistrationsController::deleteAll');
+    $routes->group('campus', static function ($campus) {
+        $campus->get('/', 'Admin\RegistrationsController::allInscritos');
+        $campus->get('getAllCampus', 'CampusController::getAllCampus');
     });
+
+    $routes->group('institutos', static function ($institutos) {
+        $institutos->get('/', 'Admin\RegistrationsController::allInscritos');
+        $institutos->get('getInstitutos', 'InstitutosController::getInstitutos');
+    });
+
     $routes->group('recaudaciones', static function ($recaudaciones){
         $recaudaciones->get('/', 'Admin\UsersController::recaudaciones');
         $recaudaciones->get('online', 'Admin\UsersController::online');

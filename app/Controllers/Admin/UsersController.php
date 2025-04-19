@@ -150,7 +150,7 @@ class UsersController extends BaseController
                 ],
                 'rol' => [
                     'label' => 'Rol',
-                    'rules' => 'required|in_list[1,2,3]',
+                    'rules' => 'required|in_list[1,2,3,4]',
                 ]
             ]);
 
@@ -198,7 +198,6 @@ class UsersController extends BaseController
                 ]);
         }
     }
-
 
     public function deleteUsers()
     {
@@ -281,42 +280,98 @@ class UsersController extends BaseController
 
     public function registrar()
     {
-
-        // Obtener datos del formulario
-        $data = [
-            'email' => $this->request->getPost('email'),
-            'password' => $this->request->getPost('password'),
-            'nombres' => $this->request->getPost('nombres'),
-            'apellidos' => $this->request->getPost('apellidos'),
-            'cedula' => $this->request->getPost('cedula'),
-            'id_campus' => $this->request->getPost('id_campus'),
-            'id_instituto' => $this->request->getPost('id_instituto'),
-            'rol' => $this->request->getPost('rol')
-        ];
-
-        $result = $this->usersModel->registrarUsuario($data);
-        return $this->respond($result);
-    }
-
-    public function login()
-    {
         try {
-            $email = $this->request->getPost('email');
+            // Obtener datos POST
+            $email = trim($this->request->getPost('email'));
             $password = $this->request->getPost('password');
+            $nombres = trim($this->request->getPost('nombres'));
+            $apellidos = trim($this->request->getPost('apellidos'));
+            $cedula = trim($this->request->getPost('cedula'));
+            $id_campus = $this->request->getPost('id_campus');
+            $rol = trim($this->request->getPost('rol'));
 
-            $userData = $this->usersModel->login($email, $password);
+            $data = [
+                'email' => $email,
+                'password' => $password,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'cedula' => $cedula,
+                'id_campus' => $id_campus,
+                'rol' => $rol,
+            ];
 
-            if ($userData) {
-                $session = session();
-                $session->set('user_session', $userData);
-                return $this->respond($userData, 200);
-            } else {
-                return $this->failUnauthorized('Usuario o contraseña incorrectos');
+            // Validación
+            $validation = \Config\Services::validation();
+            $validation->setRules([
+                'cedula' => [
+                    'label' => 'Número de cédula',
+                    'rules' => 'required|numeric|max_length[10]|is_unique[users.cedula]',
+                ],
+                'nombres' => [
+                    'label' => 'Nombres',
+                    'rules' => 'required|min_length[3]',
+                ],
+                'apellidos' => [
+                    'label' => 'Apellidos',
+                    'rules' => 'required|min_length[3]',
+                ],
+                'email' => [
+                    'label' => 'Correo electrónico',
+                    'rules' => 'required|valid_email|is_unique[users.email]',
+                ],
+                'password' => [
+                    'label' => 'Contraseña',
+                    'rules' => 'required|min_length[6]',
+                ],
+                'rol' => [
+                    'label' => 'Rol',
+                    'rules' => 'required|in_list[1,2,3,4]',
+                ],
+                'id_campus' => [
+                    'label' => 'Campus',
+                    'rules' => 'permit_empty|numeric',
+                ],
+            ]);
+
+            if (!$validation->run($data)) {
+                return $this->response
+                    ->setStatusCode(422)
+                    ->setJSON([
+                        'success' => false,
+                        'errors' => $validation->getErrors(),
+                    ]);
             }
-        } catch (\PDOException $e) {
-            return $this->failServerError('Error de base de datos: ' . $e->getMessage());
+
+            // Encriptar contraseña antes de guardar
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+
+            // Registrar usuario
+            $resultado = $this->usersModel->insert($data);
+
+            if ($resultado) {
+                return $this->response
+                    ->setStatusCode(201)
+                    ->setJSON([
+                        'success' => true,
+                        'message' => 'Usuario registrado correctamente.',
+                        'user_id' => $resultado
+                    ]);
+            } else {
+                return $this->response
+                    ->setStatusCode(500)
+                    ->setJSON([
+                        'success' => false,
+                        'error' => 'Error al registrar el usuario.',
+                        'db_errors' => $this->usersModel->errors()
+                    ]);
+            }
         } catch (\Exception $e) {
-            return $this->failServerError('Error inesperado: ' . $e->getMessage());
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'success' => false,
+                    'error' => 'Error interno: ' . $e->getMessage(),
+                ]);
         }
     }
 }

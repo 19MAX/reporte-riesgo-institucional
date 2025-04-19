@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Cargar los datos de los campus
     async function loadCampuses() {
         try {
-            const response = await fetch("../../controllers/router.php?op=getAllCampus");
+            const response = await fetch(base_url + "admin/campus/getAllCampus");
             if (!response.ok) throw new Error("No se pudieron cargar los datos de los campus.");
             const campuses = await response.json();
             return campuses;
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadInstitutes() {
         try {
-            const response = await fetch("../../controllers/router.php?op=getInstitutos");
+            const response = await fetch(base_url + "admin/institutos/getInstitutos");
             if (!response.ok) throw new Error("No se pudieron cargar los datos de los institutos.");
             const institutes = await response.json();
             return institutes;
@@ -64,6 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("agregarUsuarioForm").addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(this);
+        // Obtener token
+        const csrfName = document.getElementById("csrf_token_name").name;
+        const csrfHash = document.getElementById("csrf_token_name").value;
+        formData.append(csrfName, csrfHash); // Agregar CSRF token
 
         // Verificar campos visibles
         const inputRol = document.getElementById("inputRol").value;
@@ -76,13 +80,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        fetch("../../controllers/router.php?op=registro", {
+        fetch(base_url + "admin/users/registro", {
             method: "POST",
             body: formData,
         })
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
+                    refreshCsrfToken();
                     swal({
                         title: "¡Excelente!",
                         text: "¡El registro se realizó de manera exitosa!",
@@ -96,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch((error) => {
+                refreshCsrfToken();
                 console.error("Error al agregar el usuario:", error.message);
                 swal("¡Ups! Algo salió mal!", error.message, "error");
             });
