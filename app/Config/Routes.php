@@ -24,7 +24,6 @@ $routes->post('assignCampus', 'UserController::asignarUsuarioACampus');
 
 // Rutas para el InstitutosController
 $routes->get('getInstitutos', 'InstitutosController::getInstitutos');
-$routes->post('insertIes', 'InstitutosController::insertIes');
 $routes->post('updateIes', 'InstitutosController::updateIes');
 $routes->post('deleteIes', 'InstitutosController::deleteIes');
 
@@ -97,8 +96,10 @@ $routes->group('admin', static function ($routes) {
     });
 
     $routes->group('institutos', static function ($institutos) {
-        $institutos->get('/', 'Admin\RegistrationsController::allInscritos');
+        $institutos->get('/', 'InstitutosController::index');
         $institutos->get('getInstitutos', 'InstitutosController::getInstitutos');
+        $institutos->get('add', 'InstitutosController::addView');
+        $institutos->post('insertIes', 'InstitutosController::insertIes');
     });
 
     $routes->group('recaudaciones', static function ($recaudaciones){

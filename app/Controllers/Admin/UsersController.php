@@ -24,6 +24,7 @@ class UsersController extends BaseController
 
         return view("admin/users/index", $data);
     }
+
     public function add()
     {
         $data = [

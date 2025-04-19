@@ -12,7 +12,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item <?= ($modulo === 'home') ? 'active menu-open' : '' ?>">
-        <a href="index.php?modulo=home" class="nav-link">
+        <a href="<?=base_url("admin")?>" class="nav-link">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Panel</span></a>
     </li>
@@ -26,7 +26,7 @@
     </li>
     <hr class="sidebar-divider">
     <li class="nav-item <?= ($modulo === 'institutos') ? 'active' : '' ?>">
-        <a class="nav-link" href="index.php?modulo=institutos">
+        <a class="nav-link" href="<?=base_url("admin/institutos")?>">
             <i class="fa fa-map-marker"></i>
             <span>Institutos</span>
         </a>
