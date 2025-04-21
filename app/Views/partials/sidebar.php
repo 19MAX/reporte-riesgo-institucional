@@ -19,13 +19,13 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <li class="nav-item <?= ($modulo === 'fichas') ? 'active menu-open' : '' ?>">
+    <li class="nav-item <?= ($modulo === 'FICHAS') ? 'active menu-open' : '' ?>">
         <a class="nav-link" href="<?= base_url("admin/fichas")?>">
             <i class="fas fa-paste"></i>
             <span>Fichas</span></a>
     </li>
     <hr class="sidebar-divider">
-    <li class="nav-item <?= ($modulo === 'institutos') ? 'active' : '' ?>">
+    <li class="nav-item <?= ($modulo === 'INSTITUTOS') ? 'active' : '' ?>">
         <a class="nav-link" href="<?=base_url("admin/institutos")?>">
             <i class="fa fa-map-marker"></i>
             <span>Institutos</span>
