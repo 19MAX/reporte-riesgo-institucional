@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <div class="d-flex">
                     <!-- <button type="button" class="btn btn-outline-warning m-1 btnEditar" title="Editar" data-id="${row.id_usuario}"><i class="far fa-edit"></i></button>-->
 
-                      <a href="../main/index.php?modulo=pdf&user=${row.id_usuario}&id_ficha=${row.id_ficha}" class="btn btn-outline-primary m-1" title="Reporte de la ficha">
+                      <a href="${base_url + "admin/fichas/"+row.id_ficha}" class="btn btn-outline-primary m-1" title="Reporte de la ficha">
                       <i class="fa-solid fa-chart-pie"></i>
                       </a>
 

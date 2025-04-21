@@ -57,8 +57,8 @@ $routes->group('admin', static function ($routes) {
     $routes->group('fichas', static function ($fichas) {
 
         $fichas->get('/', 'FichasController::index');
+        $fichas->get('(:num)', 'Admin\FichasController::index/$1');
         $fichas->get('getFichasAll', 'FichasController::getFichasAll');
-        $fichas->get('(:num)', 'Admin\DepositosController::index/$1');
         $fichas->get('getDatosPgDeposito/(:num)', 'Admin\DepositosController::getDatosPagoDeposito/$1');
         $fichas->post('actualizarEstado/', 'Admin\DepositosController::actualizarEstado');
         $fichas->get('obtener_depositos/(:num)', 'Admin\DepositosController::obtenerDeposito/$1');
@@ -73,6 +73,14 @@ $routes->group('admin', static function ($routes) {
         $fichas->get('incompletos', 'Admin\PagosController::incompletos');
     });
 
+
+    $routes->group('formulario', static function ($forms) {
+        $forms->get('(:num)', 'FormsController::index/$1');
+        $forms->get('getSede/(:num)', 'FormsController::getSede/$1');
+        $forms->post('insertFichas', 'FormsController::insertFichas');
+        $forms->post('update', 'FormsController::update');
+        $forms->post('delete', 'FormsController::delete');
+    });
 
     $routes->group('users', static function ($users) {
         $users->get('/', 'Admin\UsersController::index');
