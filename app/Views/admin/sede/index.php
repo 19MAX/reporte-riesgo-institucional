@@ -35,10 +35,6 @@ Sedes
                             <td><?= htmlspecialchars($sede['direccion']) ?></td>
                             <td>
                                 <div class="d-flex">
-                                    <button type="button" class="btn btn-outline-success m-1 rounded-circle btnCampus"
-                                        title="Agregar Campus" data-id="<?= $sede['id'] ?>">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
                                     <button type="button" class="btn btn-outline-warning m-1 btnEditar" title="Editar"
                                         data-id="<?= $sede['id'] ?>" data-nombre="<?= $sede['nombre'] ?>"
                                         data-direccion="<?= $sede['direccion'] ?>">

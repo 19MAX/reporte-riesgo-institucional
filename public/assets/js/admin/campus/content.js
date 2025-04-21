@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 titleAttr: 'Regresar a las sedes',
                 className: 'bg-dark rounded mb-1',
                 action: function () {
-                    window.location.href = "../main/index.php?modulo=sede&user=" + idRegreso;
+                    window.location.href = base_url + "admin/sede/" + id_ies;
                 },
             },
         ],

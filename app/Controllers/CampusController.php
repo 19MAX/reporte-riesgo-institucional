@@ -32,11 +32,13 @@ class CampusController extends BaseController
     {
 
         $campus = $this->campusModel->getAllCampus($id);
+        $sede = $this->sedeModel->find($id);
 
         $data = [
             "modulo" => ModulosAdmin::CAMPUS,
             "campus" => $campus,
-            "id_sede" => $id
+            "id_sede" => $id,
+            "id_ies" => $sede["id_IES"]
         ];
 
         return view("admin/campus/index", $data);

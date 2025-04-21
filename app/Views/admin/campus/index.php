@@ -190,5 +190,8 @@ Campus
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script>
+    const id_ies = <?=$id_ies?>;
+</script>
 <script src="<?= base_url("assets/js/admin/campus/content.js") ?>"></script>
 <?= $this->endSection() ?>
