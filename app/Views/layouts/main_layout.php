@@ -48,6 +48,18 @@
 
     <script>
         const base_url = "<?= base_url() ?>";
+
+        // Verificar si hay mensajes de éxito, advertencia o error
+        <?php if (session()->has('flashMessages')): ?>
+            <?php foreach (session('flashMessages') as $message): ?>
+                <?php
+                $type = $message[1];
+                $msg = $message[0];
+                $uniqueCode = isset($message[2]) ? $message[2] : null;
+                ?>
+                showAlert('<?= $type ?>', '<?= $msg ?>', '<?= $uniqueCode ?>');
+            <?php endforeach; ?>
+        <?php endif; ?>
     </script>
 
     <?= $this->renderSection('scripts'); ?>

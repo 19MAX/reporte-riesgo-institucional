@@ -9,16 +9,16 @@ class UsersSeeder extends Seeder
     public function run()
     {
         $data = [
-            // [
-            //     'email'      => 'admin@admin.com',
-            //     'password'   => password_hash('password', PASSWORD_DEFAULT),
-            //     'nombres'    => 'Admin',
-            //     'apellidos'  => 'Principal',
-            //     'cedula'     => '1000000001',
-            //     'id_campus'  => null,
-            //     'rol'        => '1',
-            //     'created_at' => date('Y-m-d H:i:s'),
-            // ],
+            [
+                'email'      => 'admin@admin.com',
+                'password'   => password_hash('password', PASSWORD_DEFAULT),
+                'nombres'    => 'Admin',
+                'apellidos'  => 'Principal',
+                'cedula'     => '1000000001',
+                'id_campus'  => null,
+                'rol'        => '1',
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
             [
                 'email'      => 'supervisor@example.com',
                 'password'   => password_hash('password', PASSWORD_DEFAULT),

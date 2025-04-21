@@ -24,8 +24,6 @@ $routes->post('assignCampus', 'UserController::asignarUsuarioACampus');
 
 // Rutas para el InstitutosController
 $routes->get('getInstitutos', 'InstitutosController::getInstitutos');
-$routes->post('updateIes', 'InstitutosController::updateIes');
-$routes->post('deleteIes', 'InstitutosController::deleteIes');
 
 // Rutas para el FichasController
 $routes->get('getIdCampus', 'FichasController::getIdCampus');
@@ -100,6 +98,16 @@ $routes->group('admin', static function ($routes) {
         $institutos->get('getInstitutos', 'InstitutosController::getInstitutos');
         $institutos->get('add', 'InstitutosController::addView');
         $institutos->post('insertIes', 'InstitutosController::insertIes');
+        $institutos->post('updateIes', 'InstitutosController::updateIes');
+        $institutos->post('deleteIes', 'InstitutosController::deleteIes');
+    });
+
+    $routes->group('sede', static function ($sede) {
+        $sede->get('(:num)', 'SedeController::index/$1');
+        $sede->get('getSede/(:num)', 'SedeController::getSede/$1');
+        $sede->post('add', 'SedeController::add');
+        $sede->post('update', 'SedeController::update');
+        $sede->post('delete', 'SedeController::delete');
     });
 
     $routes->group('recaudaciones', static function ($recaudaciones){

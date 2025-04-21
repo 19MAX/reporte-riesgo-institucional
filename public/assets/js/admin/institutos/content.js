@@ -125,14 +125,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     return `
 
                     <div class="d-flex">
-                      <button type="button" class="btn btn-outline-success m-1 rounded-circle btnSede" title="Agregar Sede" data-id="${row.id}"><i class="fas fa-plus "></i></button>
                       <button type="button" class="btn btn-outline-warning m-1 btnEditar" title="Editar" data-id="${row.id}"><i class="far fa-edit"></i></button>
 
                       <button type="button" class="btn btn-outline-danger m-1 btnEliminar" title="Eliminar" data-id="${row.id}">
                         <i class="fas fa-trash-alt "></i>
                       </button>
 
-                      <a href="../main/index.php?modulo=sede&user=${row.id}" class="btn btn-outline-primary m-1" title="Sede">
+                      <a href="${base_url}admin/sede/${row.id}" class="btn btn-outline-primary m-1" title="Sede">
                         <i class="fa fa-map-marker"></i>
                       </a>
 
@@ -159,13 +158,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("zonaInput").value = rowData.zona;
     });
 
-    // Manejador de eventos para el botón de editar
-    $(document).on("click", ".btnSede", function () {
-        var rowData = miTabla.row($(this).closest("tr")).data();
-        $("#agregarSede").modal("show");
-        document.getElementById("id_ies_sede").value = rowData.id;
-        document.getElementById("nombreIes").value = rowData.nombre;
-    });
 
     // Manejador de eventos para el botón de eliminar
     $(document).on("click", ".btnEliminar", function () {
@@ -176,11 +168,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // Escuchar el click en el botón de eliminación dentro del modal
         $(document).on("click", "#btn-delete", function () {
+            //token
+            const csrfName = document.getElementById("csrf_token_name").name;
+            const csrfHash = document.getElementById("csrf_token_name").value;
             var formData = new FormData();
             formData.append("id", rowData.id);
             formData.append("nombre", rowData.nombre);
+            formData.append(csrfName, csrfHash); // Agregar CSRF token
 
-            fetch("../../controllers/router.php?op=deleteIes", {
+            fetch(base_url + "admin/institutos/deleteIes", {
                 method: "POST",
                 body: formData,
             })
@@ -198,6 +194,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reloadSection();
                 })
                 .then((data) => {
+                    refreshCsrfToken();
                     if (data && data.error) {
                         // Si hay un error, muestra el mensaje de error
                         swal(
@@ -208,12 +205,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
                 })
                 .catch((error) => {
+                    refreshCsrfToken();
                     swal(
                         "Ups! Algo salio mal!",
                         "La acción no se pudo realizar correctamente!",
                         "error"
                     );
-                    setLoading(false);
+                    // setLoading(false);
                     console.error("Error al eliminar el instituto:", error);
                 });
         });
@@ -223,10 +221,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         //     setLoading(true);
         update(); // Llama a la función update cuando se hace clic en el botón
     });
-    document.getElementById("btn-add").addEventListener("click", function () {
-        //     setLoading(true);
-        addSede(); // Llama a la función update cuando se hace clic en el botón
-    });
+    // document.getElementById("btn-add").addEventListener("click", function () {
+    //     //     setLoading(true);
+    //     addSede(); // Llama a la función update cuando se hace clic en el botón
+    // });
 
 
     function update() {
@@ -242,6 +240,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             const region = document.getElementById("regionInput").value;
             const zona = document.getElementById("zonaInput").value;
             const logo = document.getElementById("logoInput").files[0];
+            const csrfName = document.getElementById("csrf_token_name").name;
+            const csrfHash = document.getElementById("csrf_token_name").value;
             const formData = new FormData();
             formData.append("nombre", nombre);
             formData.append("codigo", codigo);
@@ -253,12 +253,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             formData.append("region", region);
             formData.append("zona", zona);
             formData.append("logo", logo);
+            formData.append(csrfName, csrfHash);
             if (isNaN(codigo)) {
                 swal("¡Ups!", "El código debe ser un número.", "error");
                 return; // Salir de la función si el código no es un número
             }
             formData.append("id", id);
-            fetch("../../controllers/router.php?op=updateIes", {
+            fetch(base_url + "admin/institutos/updateIes", {
                 method: "POST",
                 body: formData,
             })
@@ -277,6 +278,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     return response.json(); // Parse the JSON response
                 })
                 .then((data) => {
+                    refreshCsrfToken();
                     $("#Editar_datos").modal("hide");
                     swal({
                         title: "En Hora Buena!",
@@ -288,10 +290,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reloadSection();
                 })
                 .catch((error) => {
+                    refreshCsrfToken();
                     console.error("Error al actualizar los datos:", error.message);
                     swal("Ups! Algo salió mal!", error.message, "error");
                 });
         } catch (error) {
+            refreshCsrfToken();
             console.error("Error al obtener los datos del formulario:", error);
             swal(
                 "Ups! Algo salio mal!",
@@ -301,59 +305,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    function addSede() {
-        try {
-            const id = document.getElementById("id_ies_sede").value;
-            const nombre = document.getElementById("nombreSede").value;
-            const direccion = document.getElementById("direccionSede").value;
-
-            const formData = new FormData();
-            formData.append("nombre", nombre);
-            formData.append("direccion", direccion);
-            formData.append("id", id);
-
-            fetch("../../controllers/router.php?op=insertSede", {
-                method: "POST",
-                body: formData,
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        return response.json().then((data) => {
-                            let errorMessage = "La acción no se pudo realizar correctamente!";
-                            if (data && data.errors) {
-                                errorMessage = data.errors.join(", ");
-                            } else if (data && data.error) {
-                                errorMessage = data.error;
-                            }
-                            throw new Error(errorMessage);
-                        });
-                    }
-                    return response.json(); // Parse the JSON response
-                })
-                .then((data) => {
-                    $("#agregarSede").modal("hide");
-                    swal({
-                        title: "En Hora Buena!",
-                        text: "La acción se realizó de manera exitosa!",
-                        icon: "success",
-                        timer: 1000,
-                        buttons: false,
-                    });
-                    reloadSection();
-                })
-                .catch((error) => {
-                    console.error("Error al insertar los datos:", error.message);
-                    swal("Ups! Algo salió mal!", error.message, "warning");
-                });
-        } catch (error) {
-            console.error("Error al obtener los datos del formulario:", error);
-            swal(
-                "Ups! Algo salio mal!",
-                "La acción no se pudo realizar correctamente!",
-                "error"
-            );
-        }
-    }
     function reloadSection() {
         try {
             fetch(base_url + "admin/institutos/getInstitutos").then(

@@ -17,6 +17,7 @@
     <script src="../../public/js/demo/chart-pie-demo.js"></script>-->
 <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <script src="<?=base_url("assets/js/sweetalert/sweetalert.min.js")?>"></script>
+<script src="<?=base_url("assets/js/sweetalert/showalert.js")?>"></script>
 <script src="<?=base_url("assets/js/refreshToken.js")?>"></script>
 
 

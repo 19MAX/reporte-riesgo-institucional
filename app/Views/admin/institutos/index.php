@@ -161,53 +161,6 @@ Institutos
 </div>
 
 
-<!-- Modal Sedes -->
-<div class="modal fade" id="agregarSede" tabindex="-1" role="dialog" aria-labelledby="modalAdminLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalAdminLabel">Agregar sede</h5>
-                <button type="button" class="close"  onclick="cerrarModal('agregarSede')" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="">
-                    <input type="hidden" name="id_ies" id="id_ies_sede" value="">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label>Sede para :</label>
-                            <input type="text" class="form-control" disabled id="nombreIes" name="nombreIes">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="nombreSede" class="form-label">Nombre de la sede</label>
-                            <input type="text" class="form-control" id="nombreSede" name="nombreSede">
-                        </div>
-                    </div>
-                    <input type="hidden" name="nombre_ies" value="">
-
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="direccionInput" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="direccionSede" name="direccionInput">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="btn-add">Agregar sede</button>
-                        <button type="button" class="btn btn-secondary"  onclick="cerrarModal('agregarSede')" data-dismiss="modal">Cerrar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
