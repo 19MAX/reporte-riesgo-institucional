@@ -6,7 +6,7 @@ class ModulosAdmin
     const INSTITUTOS = 'INSTITUTOS';
     const SEDE = 'SEDE';
     const CAMPUS = 'CAMPUS';
-    const CATEGORY_LIST = 'CATEGORY_LIST';
+    const FICHAS = 'FICHAS';
     const CATEGORY_ADD = 'CATEGORY_ADD';
     const EVENTS = 'EVENTS';
     const EVENTS_LIST = 'EVENTS_LIST';

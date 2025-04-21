@@ -43,7 +43,6 @@ $routes->post('updateCampus', 'CampusController::updateCampus');
 $routes->post('deleteCampus', 'CampusController::deleteCampus');
 
 // Rutas para el FormulariosController
-$routes->get('getFichasAll', 'FormulariosController::getFichasAll');
 $routes->get('getFichaDetalle', 'FormulariosController::getFichaDetalle');
 $routes->get('getFichaUser', 'FormulariosController::getFichaUser');
 
@@ -57,7 +56,8 @@ $routes->group('admin', static function ($routes) {
 
     $routes->group('fichas', static function ($fichas) {
 
-        $fichas->get('/', 'Admin\PagosController::index');
+        $fichas->get('/', 'FichasController::index');
+        $fichas->get('getFichasAll', 'FichasController::getFichasAll');
         $fichas->get('(:num)', 'Admin\DepositosController::index/$1');
         $fichas->get('getDatosPgDeposito/(:num)', 'Admin\DepositosController::getDatosPagoDeposito/$1');
         $fichas->post('actualizarEstado/', 'Admin\DepositosController::actualizarEstado');
@@ -113,17 +113,4 @@ $routes->group('admin', static function ($routes) {
         $sede->post('delete', 'SedeController::delete');
     });
 
-    $routes->group('recaudaciones', static function ($recaudaciones){
-        $recaudaciones->get('/', 'Admin\UsersController::recaudaciones');
-        $recaudaciones->get('online', 'Admin\UsersController::online');
-        $recaudaciones->get('usuarios', 'Admin\UsersController::all_recaudaciones');
-        $recaudaciones->post('filtrar_recaudaciones', 'Admin\UsersController::all_recaudaciones');
-    });
-
-    $routes->group('category', static function ($categories) {
-        $categories->get('/', 'Admin\CategoriesController::index');
-        $categories->post('add', 'Admin\CategoriesController::add');
-        $categories->post('update', 'Admin\CategoriesController::update');
-        $categories->post('delete', 'Admin\CategoriesController::delete');
-    });
 });
