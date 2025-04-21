@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Exception;
 
 class CampusModel extends Model
 {
@@ -57,6 +58,16 @@ class CampusModel extends Model
             return false;
         }
     }
+
+    public function getAllCampus($id)
+    {
+        try {
+            return $this->where('id_sede', $id)->findAll();
+        } catch (Exception $e) {
+            throw new Exception("Error al obtener campus: " . $e->getMessage());
+        }
+    }
+
 
     /**
      * Obtener campus por ID de sede

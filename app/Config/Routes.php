@@ -89,8 +89,11 @@ $routes->group('admin', static function ($routes) {
     });
 
     $routes->group('campus', static function ($campus) {
-        $campus->get('/', 'Admin\RegistrationsController::allInscritos');
+        $campus->get('(:num)', 'CampusController::index/$1');
         $campus->get('getAllCampus', 'CampusController::getAllCampus');
+        $campus->post('add', 'CampusController::add');
+        $campus->post('update', 'CampusController::update');
+        $campus->post('delete', 'CampusController::delete');
     });
 
     $routes->group('institutos', static function ($institutos) {

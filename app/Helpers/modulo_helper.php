@@ -5,6 +5,7 @@ class ModulosAdmin
     const DASHBOARD = 'DASHBOARD';
     const INSTITUTOS = 'INSTITUTOS';
     const SEDE = 'SEDE';
+    const CAMPUS = 'CAMPUS';
     const CATEGORY_LIST = 'CATEGORY_LIST';
     const CATEGORY_ADD = 'CATEGORY_ADD';
     const EVENTS = 'EVENTS';

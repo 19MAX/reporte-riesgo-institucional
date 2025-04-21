@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Inicializar DataTables con los datos que ya están en el HTML
-    var miTabla = $("#sede").DataTable({
+    var miTabla = $("#campus").DataTable({
         language: {
             buttons: {
                 sLengthMenu: "Mostrar _MENU_ resultados",
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 titleAttr: 'Agregar Sede',
                 className: 'bg-success rounded mb-1 mr-1',
                 action: function () {
-                    $('#agregarSede').modal('show');
+                    $('#agregarCampus').modal('show');
                 },
             },
             {
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 titleAttr: 'Regresar a las sedes',
                 className: 'bg-dark rounded mb-1',
                 action: function () {
-                    window.location.href = base_url + "admin/institutos";
+                    window.location.href = "../main/index.php?modulo=sede&user=" + idRegreso;
                 },
             },
         ],
@@ -101,26 +101,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Manejador para el botón de editar
     $(document).on("click", ".btnEditar", function () {
-        var sedeId = $(this).data('id');
+        var campusId = $(this).data('id');
         var nombre = $(this).data('nombre');
         var direccion = $(this).data('direccion');
+        var canton = $(this).data('canton');
+        var parroquia = $(this).data('parroquia');
 
         // Cargar los datos en el modal de editar
-        $("#Editar_datos #id_sede").val(sedeId);
+        $("#Editar_datos #id_campus").val(campusId);
         $("#Editar_datos #nombreInput").val(nombre);
-        $("#Editar_datos #direccionSede").val(direccion);
+        $("#Editar_datos #direccionCampus").val(direccion);
+        $("#Editar_datos #cantonCampus").val(canton);
+        $("#Editar_datos #parroquiaCampus").val(parroquia);
 
         $("#Editar_datos").modal("show");
     });
 
     // Manejador para el botón de eliminar
     $(document).on("click", ".btnEliminar", function () {
-        var sedeId = $(this).data('id');
+        var campusId = $(this).data('id');
         var nombre = $(this).data('nombre');
 
         // Cargar los datos en el modal de eliminar
-        $("#Eliminar #id_sede").val(sedeId);
-        $("#Eliminar #sedeName").val(nombre);
+        $("#Eliminar #id_campus").val(campusId);
+        $("#Eliminar #campusName").val(nombre);
 
         $("#Eliminar").modal("show");
     });
