@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\FichasModel;
 use App\Models\FormulariosModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -12,11 +13,14 @@ class FichasController extends ResourceController
 {
 
     protected $formularioModel;
+    protected $fichasModel;
 
     public function __construct()
     {
         $this->formularioModel = new FormulariosModel();
+        $this->fichasModel = new FichasModel();
     }
+
     public function index()
     {
 
@@ -55,15 +59,10 @@ class FichasController extends ResourceController
         return $this->respond($data);
     }
 
-    public function getFichaDetalle()
+    public function getFichaDetalle($id_ficha)
     {
-        $id_ficha = $this->request->getGet('id');
 
-        if (!$id_ficha) {
-            return $this->fail('Parámetro requerido: id', 400);
-        }
-
-        $data = $this->model->getFichaDetalle($id_ficha);
+        $data = $this->fichasModel->getFichaDetalle($id_ficha);
 
         if (empty($data)) {
             return $this->failNotFound('No se encontró el detalle de la ficha.');

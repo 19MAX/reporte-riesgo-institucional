@@ -20,7 +20,7 @@ class FichasController extends BaseController
         $this->fichasModel = new FichasModel();
     }
 
-    public function index($id)
+    public function index($id_ficha)
     {
         /* $id_campus = $this->usersModel->obtenerIdCampus($id);
         $message = [
@@ -31,11 +31,27 @@ class FichasController extends BaseController
         } */
 
         $data = [
-            "id_ficha" => $id,
+            "id_ficha" => $id_ficha,
             "modulo" => ModulosAdmin::FICHAS,
         ];
 
         return view("admin/pdf/index", $data);
     }
+    public function obtenerPromediosPorIdFicha($id_ficha)
+    {
 
+        $datos = $this->fichasModel->obtenerPromediosPorIdFicha($id_ficha);
+
+        if (is_string($datos) && strpos($datos, 'Error') === 0) {
+            var_dump($datos);
+            exit;
+        }
+
+
+        $data = [
+            "promedios" => $datos,
+        ];
+
+        return $this->response->setJSON($data);
+    }
 }

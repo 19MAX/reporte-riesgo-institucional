@@ -8,17 +8,19 @@ use Exception;
 class FichasModel extends Model
 {
     protected $db;
+    protected $logger;
 
     public function __construct()
     {
         parent::__construct();
         $this->db = \Config\Database::connect();
+        $this->logger = \Config\Services::logger();
     }
 
     public function insertarTodosDatos($seguridad_estructural, $seguridad_no_estructural, $seguridad_funcional, $seguridad_administrativa)
     {
         try {
-            $this->db->transBegin();
+            $this->db->transStart();
 
             $resultado_estructural = $this->insertarSeguridadEstructural($seguridad_estructural);
             if (!is_array($resultado_estructural) || !array_key_exists('id_se', $resultado_estructural)) {
@@ -57,10 +59,13 @@ class FichasModel extends Model
                 return $resultado_ficha;
             }
 
-            $this->db->transCommit();
+            $this->db->transComplete();
             return true;
         } catch (Exception $ex) {
             $this->db->transRollback();
+            $errorMessage = "Error en insertarTodosDatos: " . $ex->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($ex->getTraceAsString());
             return "Error: " . $ex->getMessage();
         }
     }
@@ -113,7 +118,11 @@ class FichasModel extends Model
             $id_se = $this->db->insertID();
 
             // Preparar datos para insertar en subseccion_seguridad_estructural
-            $data_sub = ['id_se' => $id_se];
+            $data_sub = [
+                'id_se' => $id_se,
+                'promedio' => $promedio  // Añadido: guardar el mismo promedio en la subsección
+            ];
+
             for ($i = 1; $i <= 25; $i++) {
                 $valor_respuesta = isset($seguridad_estructural["item$i"]) ? $seguridad_estructural["item$i"] : null;
                 $data_sub["valor_$i"] = $valor_respuesta;
@@ -123,6 +132,9 @@ class FichasModel extends Model
 
             return ['id_se' => $id_se, 'id_campus' => $id_campus, 'promedio' => $promedio];
         } catch (Exception $e) {
+            $errorMessage = "Error en insertarSeguridadEstructural: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
             return "Error al insertar datos en la base de datos: " . $e->getMessage();
         }
     }
@@ -153,6 +165,16 @@ class FichasModel extends Model
                 8 => "laboratorio_e_e_mecanica",
                 9 => "elementos_arquitectonicos",
             ];
+            // $promedios_names = [
+            //     2 => "B1",
+            //     3 => "B2",
+            //     4 => "B3",
+            //     5 => "B3",
+            //     6 => "B4",
+            //     7 => "B5",
+            //     8 => "B6",
+            //     9 => "B7",
+            // ];
 
             // Obtener el id_analista e id_campus del primer formulario para insertar en seguridad_no_estructural
             $primer_formulario = reset($seguridad_no_estructural);
@@ -259,7 +281,7 @@ class FichasModel extends Model
 
             // Actualizar el registro en seguridad_no_estructural con el promedio
             $this->db->table('seguridad_no_estructural')
-                ->where('id_sne', $id_sne)
+                ->where('id', $id_sne)
                 ->update(['promedio' => $promedio_general]);
 
             return [
@@ -269,6 +291,9 @@ class FichasModel extends Model
                 'promedios_subsecciones' => $promedios_subsecciones
             ];
         } catch (Exception $e) {
+            $errorMessage = "Error en insertarSeguridadNoEstructural: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
             return "Error al insertar datos en la base de datos: " . $e->getMessage();
         }
     }
@@ -389,7 +414,7 @@ class FichasModel extends Model
 
             // Actualizar el registro en seguridad_funcional con el promedio
             $this->db->table('seguridad_funcional')
-                ->where('id_sf', $id_sf)
+                ->where('id', $id_sf)
                 ->update(['promedio' => $promedio_general]);
 
             return [
@@ -400,6 +425,9 @@ class FichasModel extends Model
             ];
 
         } catch (Exception $e) {
+            $errorMessage = "Error en insertarSeguridadFuncional: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
             return "Error al insertar datos en la base de datos: " . $e->getMessage();
         }
     }
@@ -528,7 +556,7 @@ class FichasModel extends Model
 
             // Actualizar el registro en seguridad_administrativa con el promedio
             $this->db->table('seguridad_administrativa')
-                ->where('id_sa', $id_sa)
+                ->where('id', $id_sa)
                 ->update(['promedio' => $promedio_general]);
 
             return [
@@ -539,6 +567,9 @@ class FichasModel extends Model
             ];
 
         } catch (Exception $e) {
+            $errorMessage = "Error en insertarSeguridadAdministrativa: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
             return "Error al insertar datos en la base de datos: " . $e->getMessage();
         }
     }
@@ -563,7 +594,212 @@ class FichasModel extends Model
             $this->db->table('fichas')->insert($data);
             return true;
         } catch (Exception $e) {
+            $errorMessage = "Error en insertarFicha: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
             return "Error al insertar la ficha en la base de datos: " . $e->getMessage();
+        }
+    }
+
+    public function obtenerPromediosPorIdFicha($id_ficha)
+    {
+        try {
+            if (!is_numeric($id_ficha)) {
+                return "Error: El ID de la ficha debe ser un valor numérico.";
+            }
+
+            // Obtener la ficha con todos sus IDs relacionados
+            $ficha = $this->db->table('fichas')
+                ->select('id_se, id_sne, id_sf, id_sa, id_campus')
+                ->where('id', $id_ficha)
+                ->get()
+                ->getRowArray();
+
+            if (!$ficha) {
+                return "Error: No se encontró la ficha con ID: $id_ficha";
+            }
+
+            // Obtener promedios de cada seguridad
+            $seguridad_estructural = $this->db->table('seguridad_estructural')
+                ->select('promedio')
+                ->where('id', $ficha['id_se'])
+                ->get()
+                ->getRowArray();
+
+            $seguridad_no_estructural = $this->db->table('seguridad_no_estructural')
+                ->select('promedio')
+                ->where('id', $ficha['id_sne'])
+                ->get()
+                ->getRowArray();
+
+            $seguridad_funcional = $this->db->table('seguridad_funcional')
+                ->select('promedio')
+                ->where('id', $ficha['id_sf'])
+                ->get()
+                ->getRowArray();
+
+            $seguridad_administrativa = $this->db->table('seguridad_administrativa')
+                ->select('promedio')
+                ->where('id', $ficha['id_sa'])
+                ->get()
+                ->getRowArray();
+
+            // Obtener información del campus
+            $campus = $this->db->table('campus')
+                ->select('nombre')
+                ->where('id', $ficha['id_campus'])
+                ->get()
+                ->getRowArray();
+
+            // Calcular el promedio general
+            $promedios = [
+                'estructural' => floatval($seguridad_estructural['promedio'] ?? 0),
+                'no_estructural' => floatval($seguridad_no_estructural['promedio'] ?? 0),
+                'funcional' => floatval($seguridad_funcional['promedio'] ?? 0),
+                'administrativa' => floatval($seguridad_administrativa['promedio'] ?? 0)
+            ];
+
+            $promedio_general = array_sum($promedios) / count(array_filter($promedios, function ($v) {
+                return $v !== null; }));
+
+            // Obtener promedios de subsecciones
+            $subsecciones = [];
+
+            // Subsección Estructural
+            $subseccion_estructural = $this->db->table('subseccion_seguridad_estructural')
+                ->select('promedio')
+                ->where('id_se', $ficha['id_se'])
+                ->get()
+                ->getRowArray();
+            $subsecciones['estructural'] = $subseccion_estructural ? ['general' => floatval($subseccion_estructural['promedio'])] : null;
+
+            // Subsecciones No Estructurales
+            $subsecciones_no_estructurales = [
+                'sistema_electrico',
+                'telecomunicaciones',
+                'sistema_de_provision_de_agua',
+                'sistema_de_combustibles',
+                'gases_de_laboratorios',
+                'laboratorio_q_b_t_alimentaria',
+                'laboratorio_e_e_mecanica',
+                'elementos_arquitectonicos'
+            ];
+
+            $subsecciones['no_estructural'] = [];
+            foreach ($subsecciones_no_estructurales as $tabla) {
+                $promedio = $this->db->table($tabla)
+                    ->select('promedio')
+                    ->where('id_sne', $ficha['id_sne'])
+                    ->get()
+                    ->getRowArray();
+
+                if ($promedio) {
+                    $subsecciones['no_estructural'][$tabla] = floatval($promedio['promedio']);
+                }
+            }
+
+            // Subsecciones Funcionales
+            $subsecciones_funcionales = [
+                'organizacion_comite',
+                'procedimientos_operativos',
+                'disponibilidad_logistica'
+            ];
+
+            $subsecciones['funcional'] = [];
+            foreach ($subsecciones_funcionales as $tabla) {
+                $promedio = $this->db->table($tabla)
+                    ->select('promedio')
+                    ->where('id_sf', $ficha['id_sf'])
+                    ->get()
+                    ->getRowArray();
+
+                if ($promedio) {
+                    $subsecciones['funcional'][$tabla] = floatval($promedio['promedio']);
+                }
+            }
+
+            // Subsecciones Administrativas
+            $subsecciones_administrativas = [
+                'invertir_reduccion',
+                'trabajo_comunidad',
+                'trabajo_multidisciplinario',
+                'capacita_personal',
+                'efectos_negativos',
+                'bienestar_comunidad',
+                'mejoras_continuas'
+            ];
+
+            $subsecciones['administrativa'] = [];
+            foreach ($subsecciones_administrativas as $tabla) {
+                $promedio = $this->db->table($tabla)
+                    ->select('promedio')
+                    ->where('id_sa', $ficha['id_sa'])
+                    ->get()
+                    ->getRowArray();
+
+                if ($promedio) {
+                    $subsecciones['administrativa'][$tabla] = floatval($promedio['promedio']);
+                }
+            }
+
+            // Devolver todos los datos obtenidos
+            return [
+                'id_ficha' => $id_ficha,
+                'campus' => $campus['nombre'] ?? 'Desconocido',
+                'promedios' => $promedios,
+                'promedio_general' => $promedio_general,
+                'subsecciones' => $subsecciones,
+                'fecha' => date('Y-m-d')
+            ];
+        } catch (Exception $e) {
+            $errorMessage = "Error en obtenerPromediosPorIdFicha: " . $e->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->error($e->getTraceAsString());
+            return "Error al obtener datos de promedios: " . $e->getMessage();
+        }
+    }
+
+    public function getFichaDetalle($fichaId)
+    {
+        try {
+            $builder = $this->db->table('fichas f');
+            $builder->select('
+                i.nombre AS nombreIes,
+                i.provincia,
+                i.canton,
+                i.direccion,
+                i.codigo,
+                f.fecha,
+                u.nombres AS analista,
+                (se.promedio + sne.promedio + sf.promedio + sa.promedio) / 4 AS indiceSeguridad,
+                se.promedio AS seguridadEstructural,
+                sne.promedio AS seguridadNoEstructural,
+                sf.promedio AS seguridadFuncional,
+                sa.promedio AS seguridadAdministrativa
+            ')
+                ->join('seguridad_estructural se', 'f.id_se = se.id', 'inner')
+                ->join('seguridad_no_estructural sne', 'f.id_sne = sne.id', 'inner')
+                ->join('seguridad_funcional sf', 'f.id_sf = sf.id', 'inner')
+                ->join('seguridad_administrativa sa', 'f.id_sa = sa.id', 'inner')
+                ->join('users u', 'sa.id_analista = u.id', 'inner')
+                ->join('campus c', 'f.id_campus = c.id', 'inner')
+                ->join('sede s', 'c.id_sede = s.id', 'inner')
+                ->join('IES i', 's.id_IES = i.id', 'inner')
+                ->where('f.id', $fichaId);
+
+            $query = $builder->get();
+            $resultado = $query->getRowArray();
+
+            if ($resultado) {
+                // Formatear la fecha
+                $resultado['fecha'] = date('d/m/Y', strtotime($resultado['fecha']));
+            }
+
+            return $resultado;
+
+        } catch (\Exception $e) {
+            log_message('error', $e->getMessage());
+            return false;
         }
     }
 }

@@ -20,7 +20,7 @@ Formulario de seguridad
 <?= $this->section('scripts') ?>
 <script>
     let id_ficha = "<?= $id_ficha ? $id_ficha : null ?>";
-    let dataLogo = "<?= base_url("logo_istel.png") ?>";
+    let dataLogo = "<?= base_url("assets/img/logo_ueb.png") ?>";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.0"></script>
