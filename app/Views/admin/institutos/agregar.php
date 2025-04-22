@@ -98,11 +98,11 @@ Agregar Instituto
                     </div>
                     <div class="row mb-3">
                         <div class="col">
-                            <label for="cord_x" class="form-label">Coordenada X</label>
+                            <label for="cord_x" class="form-label">Latitud</label>
                             <input type="text" class="form-control" id="cord_x" name="cord_x">
                         </div>
                         <div class="col">
-                            <label for="cord_y" class="form-label">Coordenada Y</label>
+                            <label for="cord_y" class="form-label">Longitud</label>
                             <input type="text" class="form-control" id="cord_y" name="cord_y">
                         </div>
                     </div>
