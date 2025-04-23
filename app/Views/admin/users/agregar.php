@@ -24,8 +24,8 @@ Agregar Usuario
                             <input type="text" class="form-control" id="inputCedula" name="cedula" required>
                         </div>
                         <div class="col">
-                            <label for="inputCedula" class="form-label">Contraseña</label>
-                            <input type="text" class="form-control" id="inputCedula" name="password" required>
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="text" class="form-control" id="password" name="password" required>
                         </div>
                     </div>
 

@@ -58,6 +58,7 @@ $routes->group('admin', static function ($routes) {
     $routes->group('campus', static function ($campus) {
         $campus->get('(:num)', 'CampusController::index/$1');
         $campus->get('getAllCampus', 'CampusController::getAllCampus');
+        $campus->get('getCampusSelect', 'CampusController::getCampusSelect');
         $campus->post('add', 'CampusController::add');
         $campus->post('update', 'CampusController::update');
         $campus->post('delete', 'CampusController::delete');
@@ -66,6 +67,7 @@ $routes->group('admin', static function ($routes) {
     $routes->group('institutos', static function ($institutos) {
         $institutos->get('/', 'InstitutosController::index');
         $institutos->get('getInstitutos', 'InstitutosController::getInstitutos');
+        $institutos->get('getInstitutosSelect', 'InstitutosController::getInstitutosSelect');
         $institutos->get('add', 'InstitutosController::addView');
         $institutos->post('insertIes', 'InstitutosController::insertIes');
         $institutos->post('updateIes', 'InstitutosController::updateIes');

@@ -68,20 +68,6 @@ class CampusModel extends Model
         }
     }
 
-
-    /**
-     * Obtener campus por ID de sede
-     */
-    public function getCampusBySede($id_sede)
-    {
-        try {
-            return $this->where('id_sede', $id_sede)->findAll();
-        } catch (\Exception $e) {
-            log_message('error', 'Error al obtener campus por sede: ' . $e->getMessage());
-            return false;
-        }
-    }
-
     /**
      * Insertar un nuevo campus
      */

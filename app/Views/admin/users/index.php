@@ -22,6 +22,7 @@ Usuarios
         </div>
     </div>
 </div>
+
 <!-- Modal Eliminar -->
 <div class="modal fade" id="Eliminar" tabindex="-1" role="dialog" aria-labelledby="modalAdminLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -49,14 +50,13 @@ Usuarios
     </div>
 </div>
 
-
 <!-- Modal Editar datos -->
 <div class="modal fade" id="Editar_datos" tabindex="-1" role="dialog" aria-labelledby="modalAdminLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalAdminLabel">Editar datos del instituto</h5>
+                <h5 class="modal-title" id="modalAdminLabel">Editar datos del usuario</h5>
                 <button type="button" class="close" onclick="cerrarModal('Editar_datos')" data-dismiss="modal"
                     aria-label="Cerrar">
                     <span aria-hidden="true">&times;</span>

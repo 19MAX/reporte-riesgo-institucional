@@ -45,7 +45,7 @@ class CreateUsersTable extends Migration
             ],
             'rol' => [
                 'type' => 'ENUM',
-                'constraint' => ['1', '2', '3'],  // 1: Admin, 2: Supervisor, 3: Analista
+                'constraint' => ['1', '2', '3', '4'],  // 1: Admin, 2: Supervisor, 3: Analista, 4: Lector
                 'default' => '3',
             ],
             'created_at' => [

@@ -52,34 +52,31 @@ class CampusController extends BaseController
         return $this->response->setJSON($data);
     }
 
-    public function getCampus()
+
+    public function getCampusSelect()
     {
-        // Para la petición GET con parámetro id
-        $id = $this->request->getGet('id');
+        try {
+            // Verificar si hay un término de búsqueda
+            $search = $this->request->getGet('term');
 
-        if (!$id) {
-            return $this->response->setStatusCode(400)
-                ->setContentType('application/json')
-                ->setJSON(['error' => 'Missing parameter: id']);
+            if ($search) {
+                // Si hay término de búsqueda, filtrar los resultados
+                $data = $this->campusModel->like('nombre', $search)->findAll();
+            } else {
+                // Si no hay término, traer todos (limitados para evitar sobrecarga)
+                $data = $this->campusModel->findAll(15); // Limitado a 15 resultados por defecto
+            }
+
+            if (empty($data)) {
+                return $this->response->setJSON([])->setStatusCode(ResponseInterface::HTTP_OK);
+            }
+
+            return $this->response->setJSON($data)->setStatusCode(ResponseInterface::HTTP_OK);
+        } catch (\Exception $e) {
+            log_message('error', 'Error al obtener campus: ' . $e->getMessage());
+            return $this->response->setJSON(['error' => 'Error al cargar los campus'])->setStatusCode(ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-
-        $data = $this->campusModel->getCampusBySede($id);
-
-        if ($data === false) {
-            return $this->response->setStatusCode(500)
-                ->setContentType('application/json')
-                ->setJSON(['error' => 'Error al obtener los campus']);
-        }
-
-        if (empty($data)) {
-            return $this->response->setStatusCode(204);
-        }
-
-        return $this->response->setContentType('application/json')
-            ->setJSON($data);
     }
-
 
     public function add()
     {
@@ -219,7 +216,6 @@ class CampusController extends BaseController
             return $this->redirectView(null, [['No se pudo actualizar el campus.', 'danger']], null, null, $id_sede);
         }
     }
-
 
     public function delete()
     {

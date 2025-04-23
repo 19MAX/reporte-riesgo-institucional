@@ -54,6 +54,31 @@ class InstitutosController extends BaseController
         // return $this->response->setJSON($data);
     }
 
+    public function getInstitutosSelect()
+    {
+        try {
+            // Verificar si hay un término de búsqueda
+            $search = $this->request->getGet('term');
+
+            if ($search) {
+                // Si hay término de búsqueda, filtrar los resultados
+                $data = $this->institutoModel->like('nombre', $search)->findAll();
+            } else {
+                // Si no hay término, traer todos (limitados para evitar sobrecarga)
+                $data = $this->institutoModel->findAll(15); // Limitado a 15 resultados por defecto
+            }
+
+            if (empty($data)) {
+                return $this->response->setJSON([])->setStatusCode(ResponseInterface::HTTP_OK);
+            }
+
+            return $this->response->setJSON($data)->setStatusCode(ResponseInterface::HTTP_OK);
+        } catch (\Exception $e) {
+            log_message('error', 'Error al obtener institutos: ' . $e->getMessage());
+            return $this->response->setJSON(['error' => 'Error al cargar los institutos'])->setStatusCode(ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // POST /institutos
     public function insertIes()
     {

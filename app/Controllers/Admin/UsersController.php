@@ -334,7 +334,6 @@ class UsersController extends BaseController
         }
     }
 
-
     public function cambiarPass()
     {
         try {
@@ -360,22 +359,27 @@ class UsersController extends BaseController
             $nombres = trim($this->request->getPost('nombres'));
             $apellidos = trim($this->request->getPost('apellidos'));
             $cedula = trim($this->request->getPost('cedula'));
-            $id_campus = $this->request->getPost('id_campus');
             $rol = trim($this->request->getPost('rol'));
+            $id_campus = $this->request->getPost('id_campus');
+            $id_instituto = $this->request->getPost('id_instituto');
 
-            $data = [
+            // Preparar datos iniciales del usuario
+            $userData = [
                 'email' => $email,
                 'password' => $password,
                 'nombres' => $nombres,
                 'apellidos' => $apellidos,
                 'cedula' => $cedula,
-                'id_campus' => $id_campus,
                 'rol' => $rol,
             ];
 
-            // Validación
-            $validation = \Config\Services::validation();
-            $validation->setRules([
+            // Agregar id_campus solo si no es supervisor (rol 2)
+            if ($rol != '2' && !empty($id_campus)) {
+                $userData['id_campus'] = $id_campus;
+            }
+
+            // Validación base para todos los campos comunes
+            $rules = [
                 'cedula' => [
                     'label' => 'Número de cédula',
                     'rules' => 'required|numeric|max_length[10]|is_unique[users.cedula]',
@@ -400,50 +404,142 @@ class UsersController extends BaseController
                     'label' => 'Rol',
                     'rules' => 'required|in_list[1,2,3,4]',
                 ],
-                'id_campus' => [
-                    'label' => 'Campus',
-                    'rules' => 'permit_empty|numeric',
-                ],
-            ]);
+            ];
 
-            if (!$validation->run($data)) {
+            // Agregar reglas específicas según el rol
+            if ($rol == '2') { // Supervisor
+                $rules['id_instituto'] = [
+                    'label' => 'Instituto',
+                    'rules' => 'required|numeric|is_not_unique[IES.id]',
+                ];
+            } else if ($rol == '3' || $rol == '4') { // Analista o Lector
+                $rules['id_campus'] = [
+                    'label' => 'Campus',
+                    'rules' => 'required|numeric|is_not_unique[campus.id]',
+                ];
+            }
+
+            // Validar datos
+            $validation = \Config\Services::validation();
+            $validation->setRules($rules);
+
+            $validData = [
+                'cedula' => $cedula,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'email' => $email,
+                'password' => $password,
+                'rol' => $rol,
+                'id_campus' => $id_campus,
+                'id_instituto' => $id_instituto,
+            ];
+
+            if (!$validation->run($validData)) {
                 return $this->response
                     ->setStatusCode(422)
                     ->setJSON([
                         'success' => false,
+                        'message' => 'Error de validación',
                         'errors' => $validation->getErrors(),
                     ]);
             }
 
             // Encriptar contraseña antes de guardar
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            $userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
 
-            // Registrar usuario
-            $resultado = $this->usersModel->insert($data);
+            // Iniciar transacción
+            $db = \Config\Database::connect();
+            $db->transStart();
 
-            if ($resultado) {
+            try {
+                // Insertar usuario
+                $userInserted = $this->usersModel->insert($userData);
+
+                if (!$userInserted) {
+                    throw new \Exception('Error al insertar el usuario');
+                }
+
+                // Si es supervisor, insertar relación con instituto
+                if ($rol == '2' && !empty($id_instituto)) {
+                    $usuarioInstitutoModel = model('UsuarioInstitutoModel'); // Asegúrate de tener este modelo
+                    $existingSupervisor = $usuarioInstitutoModel
+                        ->select('usuario_instituto.id')
+                        ->join('users', 'users.id = usuario_instituto.id_usuario')
+                        ->where('usuario_instituto.id_instituto', $id_instituto)
+                        ->where('users.rol', '2')
+                        ->first();
+
+                    if ($existingSupervisor) {
+                        // Ya existe un supervisor para ese instituto
+                        $db->transRollback(); // Cancelar la transacción que inició antes
+                        return $this->response
+                            ->setStatusCode(409) // Conflicto
+                            ->setJSON([
+                                'success' => false,
+                                'message' => 'Ya existe un usuario supervisor asignado a este instituto.',
+                            ]);
+                    }
+
+                    // No existe, se procede a insertar
+                    $institutoData = [
+                        'id_usuario' => $userInserted,
+                        'id_instituto' => $id_instituto
+                    ];
+
+                    $institutoInserted = $usuarioInstitutoModel->insert($institutoData);
+
+                    if (!$institutoInserted) {
+                        throw new \Exception('Error al asociar usuario con instituto');
+                    }
+                }
+                if ($rol == '3' && !empty($id_campus)) {
+                    $existingAnalyst = $this->usersModel
+                        ->where('id_campus', $id_campus)
+                        ->where('rol', '3')
+                        ->first();
+
+                    if ($existingAnalyst) {
+                        $db->transRollback();
+                        return $this->response
+                            ->setStatusCode(409)
+                            ->setJSON([
+                                'success' => false,
+                                'message' => 'Ya existe un usuario analista asignado a este campus.',
+                            ]);
+                    }
+                }
+
+                // Confirmar transacción
+                $db->transComplete();
+
                 return $this->response
                     ->setStatusCode(201)
                     ->setJSON([
                         'success' => true,
                         'message' => 'Usuario registrado correctamente.',
-                        'user_id' => $resultado
+                        'user_id' => $userInserted
                     ]);
-            } else {
+
+            } catch (\Exception $e) {
+                // Revertir transacción en caso de error
+                $db->transRollback();
+
                 return $this->response
                     ->setStatusCode(500)
                     ->setJSON([
                         'success' => false,
-                        'error' => 'Error al registrar el usuario.',
-                        'db_errors' => $this->usersModel->errors()
+                        'message' => 'Error al registrar el usuario.',
+                        'error' => $e->getMessage()
                     ]);
             }
+
         } catch (\Exception $e) {
             return $this->response
                 ->setStatusCode(500)
                 ->setJSON([
                     'success' => false,
-                    'error' => 'Error interno: ' . $e->getMessage(),
+                    'message' => 'Error interno del servidor',
+                    'error' => $e->getMessage(),
                 ]);
         }
     }
