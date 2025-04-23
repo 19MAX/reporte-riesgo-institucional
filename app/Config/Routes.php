@@ -10,42 +10,10 @@ $routes->get('/', 'Home::index');
 $routes->get('login', 'AuthController::index');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
+
 //Token Csrf
 $routes->get('getNewCsrfToken', 'CsrfController::getNewCsrfToken');
 
-
-// Rutas para el UserController
-$routes->get('getUserData', 'UserController::getUserData');
-$routes->get('getAllUsers', 'UserController::getAllUsers');
-$routes->post('login', 'UserController::login');
-$routes->post('resetpassci', 'UserController::resetPassClient');
-$routes->post('cambiarPass', 'UserController::cambiarPass');
-$routes->post('assignCampus', 'UserController::asignarUsuarioACampus');
-
-// Rutas para el InstitutosController
-$routes->get('getInstitutos', 'InstitutosController::getInstitutos');
-
-// Rutas para el FichasController
-$routes->get('getIdCampus', 'FichasController::getIdCampus');
-$routes->post('insertFichas', 'FichasController::insertFichas');
-
-// Rutas para el SedeController
-$routes->get('getSede', 'SedeController::getSede');
-$routes->post('insertSede', 'SedeController::insertSede');
-$routes->post('updateSede', 'SedeController::updateSede');
-$routes->post('deleteSede', 'SedeController::deleteSede');
-
-// Rutas para el CampusController
-$routes->get('getCampus', 'CampusController::getCampus');
-$routes->post('insertCampus', 'CampusController::insertCampus');
-$routes->post('updateCampus', 'CampusController::updateCampus');
-$routes->post('deleteCampus', 'CampusController::deleteCampus');
-
-// Rutas para el FormulariosController
-$routes->get('getFichaUser', 'FormulariosController::getFichaUser');
-
-// Rutas para el PromediosController
-$routes->get('getPromedios', 'PromediosController::getPromedios');
 
 // ADMIN
 $routes->group('admin', static function ($routes) {
@@ -62,9 +30,6 @@ $routes->group('admin', static function ($routes) {
         $fichas->get('getCampus', 'FichasController::getCampus');
         $fichas->get('seleccionar', 'FichasController::select');
 
-        $fichas->get('completados', 'Admin\PagosController::completados');
-        $fichas->get('rechazados', 'Admin\PagosController::rechazados');
-        $fichas->get('incompletos', 'Admin\PagosController::incompletos');
     });
 
 
