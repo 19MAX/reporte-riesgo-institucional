@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main_layout') ?>
 
 <?= $this->section('title') ?>
-Agregar Usuarios
+Agregar Usuario
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -46,11 +46,11 @@ Agregar Usuarios
                         </div>
                         <div class="col">
                             <label for="inputRol" class="form-label">Rol</label>
-                            <select class="form-select form-control" id="inputRol" name="rol" required>
+                            <select class="form-select" id="inputRol" name="rol" required>
                                 <option value="">Seleccionar...</option>
+                                <option value="2">Supervisor</option>
                                 <option value="3">Analista</option>
                                 <option value="4">Lector</option>
-                                <option value="2">Supervisor</option>
                             </select>
                         </div>
                     </div>
