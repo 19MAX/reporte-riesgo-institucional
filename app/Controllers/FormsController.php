@@ -39,7 +39,7 @@ class FormsController extends BaseController
             $data = [
                 "id_analista" => $id,
                 "id_campus" => $id_campus,
-                "modulo" => ModulosAdmin::USERS,
+                "modulo" => ModulosAdmin::FICHAS,
             ];
 
             return view("admin/forms/index", $data);

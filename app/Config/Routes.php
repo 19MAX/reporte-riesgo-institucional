@@ -27,7 +27,6 @@ $routes->get('getInstitutos', 'InstitutosController::getInstitutos');
 
 // Rutas para el FichasController
 $routes->get('getIdCampus', 'FichasController::getIdCampus');
-$routes->get('getAnalistas', 'FichasController::getAnalistas');
 $routes->post('insertFichas', 'FichasController::insertFichas');
 
 // Rutas para el SedeController
@@ -60,6 +59,8 @@ $routes->group('admin', static function ($routes) {
         $fichas->get('getFichasAll', 'FichasController::getFichasAll');
         $fichas->get('getFichaDetalle/(:num)', 'FichasController::getFichaDetalle/$1');
         $fichas->get('obtenerPromediosPorIdFicha/(:num)', 'Admin\FichasController::obtenerPromediosPorIdFicha/$1');
+        $fichas->get('getCampus', 'FichasController::getCampus');
+        $fichas->get('seleccionar', 'FichasController::select');
 
         $fichas->get('completados', 'Admin\PagosController::completados');
         $fichas->get('rechazados', 'Admin\PagosController::rechazados');
